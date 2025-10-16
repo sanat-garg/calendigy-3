@@ -18,13 +18,12 @@
             margin: 20px auto;
             padding: 20px;
             background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
             text-align: center;
-            color: #007BFF;
+            color: #0056b3;
         }
 
         table {
@@ -40,71 +39,90 @@
         }
 
         th {
-            background-color: #007BFF;
+            background-color: #0056b3;
             color: white;
-            font-weight: bold;
         }
 
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
+        #csvFile {
+            margin-bottom: 10px;
         }
 
-        /* Responsive Design */
+        #tableContainer {
+            overflow-x: auto;
+        }
+
         @media (max-width: 600px) {
-            table {
-                display: block;
-                overflow-x: auto;
+            .container {
+                padding: 10px;
             }
+
+            table {
+                font-size: 12px;
+            }
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: #0056b3;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        header img {
+            max-width: 100%;
+            height: auto;
         }
     </style>
 </head>
 <body>
+    <header>
+        <h1>CSV to HTML Table Converter</h1>
+        <img id="att-image-1760631347208">
+    </header>
     <div class="container">
-        <h1>CSV Data</h1>
-        <table id="csvTable"></table>
-        <img id="att-csv-file-1760631198070" style="display:none;">
+        <label for="csvFile">Enter CSV URL:</label>
+        <input type="text" id="csvFile" placeholder="Enter CSV URL">
+        <button onclick="loadCSV()">Load CSV</button>
+        <div id="tableContainer"></div>
     </div>
 
     <script>
-        function csvToTable(csvData) {
-            const table = document.getElementById('csvTable');
-            const rows = csvData.split('\n');
-
-            if (rows.length === 0) {
-                table.innerHTML = '<tr><td>No data available.</td></tr>';
-                return;
-            }
-
-            let tableHTML = '';
-
-            for (let i = 0; i < rows.length; i++) {
-                const cells = rows[i].split(',');
-                tableHTML += '<tr>';
-                for (let j = 0; j < cells.length; j++) {
-                    const cellValue = cells[j].trim();
-                    if (i === 0) {
-                        tableHTML += `<th>${cellValue}</th>`;
-                    } else {
-                        tableHTML += `<td>${cellValue}</td>`;
-                    }
-                }
-                tableHTML += '</tr>';
-            }
-
-            table.innerHTML = tableHTML;
+        function loadCSV() {
+            const csvFile = document.getElementById('csvFile').value;
+            fetch(csvFile)
+                .then(response => response.text())
+                .then(csv => {
+                    const table = csvToTable(csv);
+                    document.getElementById('tableContainer').innerHTML = table;
+                })
+                .catch(error => {
+                    console.error('Error fetching CSV:', error);
+                    document.getElementById('tableContainer').innerHTML = '<p>Error loading CSV data.</p>';
+                });
         }
 
-        fetch('https://sanat-garg.github.io/calendigy-3/assets/csv-file-1760631198070.b64')
-            .then(response => response.text())
-            .then(base64Data => {
-                const mimeType = 'text/csv';
-                const csvContent = atob(base64Data);
-                csvToTable(csvContent);
-            })
-            .catch(error => {
-                console.error('Error fetching or processing CSV:', error);
-                document.getElementById('csvTable').innerHTML = '<tr><td>Error loading data. Please check the console.</td></tr>';
+        function csvToTable(csv) {
+            const lines = csv.split('\n');
+            let table = '<table>';
+
+            lines.forEach((line, index) => {
+                const cells = line.split(',');
+                table += '<tr>';
+                cells.forEach(cell => {
+                    if (index === 0) {
+                        table += `<th>${cell}</th>`;
+                    } else {
+                        table += `<td>${cell}</td>`;
+                    }
+                });
+                table += '</tr>';
             });
+
+            table += '</table>';
+            return table;
+        }
+        fetch('https://sanat-garg.github.io/calendigy-3/assets/image-1760631347208.b64').then(r=>r.text()).then(b=>{ const i=document.getElementById('att-image-1760631347208'); const mime=(('https://sanat-garg.github.io/calendigy-3/assets/image-1760631347208.b64#mime=image/png'.split('#mime=')[1])||'image/png'); if(i) i.src='data:'+mime+';base64,'+b; });
     </script>
 </body>
 </html>
